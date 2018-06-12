@@ -53,7 +53,7 @@ export default class WebSocketServer {
 
   registerEvents() {
     vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
-      if (this.editor.editorDocument.uri.fsPath === document.uri.fsPath) {
+      if (this.editor.editorDocument && this.editor.editorDocument.uri.fsPath === document.uri.fsPath) {
         this.socket.send(JSON.stringify({
           type: ACTION_TYPES.UPDATE_PAGE_JS,
           data: document.getText(),

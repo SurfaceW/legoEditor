@@ -1,3 +1,5 @@
+///<reference path="../fs-extra.d.ts"/>
+
 import * as vscode from 'vscode';
 import * as fse from 'fs-extra';
 import * as path from 'path';
@@ -6,7 +8,7 @@ import * as os from 'os';
 export default class LeGaoEditor {
 
   pageDocument: string;
-  editorDocument: vscode.TextDocument;
+  editorDocument?: vscode.TextDocument;
   documentPath: string;
 
   constructor() {
@@ -32,6 +34,9 @@ export default class LeGaoEditor {
 
   async updateDocument(content: string) {
     this.pageDocument = content;
+    if (!this.editorDocument) {
+      return Promise.reject('fail, can not find editorDocument');
+    }
     try {
       const changeInstance = new vscode.WorkspaceEdit();
       const lastLine = this.editorDocument.lineAt(this.editorDocument.lineCount - 1);
