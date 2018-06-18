@@ -6,15 +6,41 @@ import LeGaoEditor from './editor';
 // TODO: make it inside extension configurations
 const WS_PORT: number = 8887;
 
+export enum ACTION_TYPES {
+  NEW_PAGE_JS = 1,
+  UPDATE_PAGE_JS = 2
+};
+
 export interface IMessage {
-  type: number;
-  data: any;
+  /**
+   * action type
+   */
+  type: ACTION_TYPES;
+  /**
+   * The content of the document
+   */
+  data: string;
+  /** 
+   * Unified identity of operation target file 
+   */
+  uri?: {
+    uuid: string;
+    /**
+     * app name
+     *
+     * @type {string}
+     */
+    appKey: string;
+    pageName: string;
+  };
 }
 
-export const ACTION_TYPES = {
-  NEW_PAGE_JS: 1,
-  UPDATE_PAGE_JS: 2,
-};
+/**
+ * serverSingleton to keep the WebServer to be 
+ * unique and only one instance in the plugin mode
+ * no matter how many times the plugin is activated
+ */
+let serverSingleton: WebSocketServer;
 
 export default class WebSocketServer {
 
@@ -23,8 +49,11 @@ export default class WebSocketServer {
   editor: LeGaoEditor;
   
   constructor() {
-    this.server = new WebSocket.Server({ port: WS_PORT });
+    if (serverSingleton) {
+      return serverSingleton;
+    }
 
+    this.server = new WebSocket.Server({ port: WS_PORT });
     this.server.on('connection', (socket) => {
       this.socket = socket;
       this.socket.on('message', (event: any) => {
@@ -39,6 +68,8 @@ export default class WebSocketServer {
 
     this.editor = new LeGaoEditor();
     this.registerEvents();
+
+    serverSingleton = this;
   }
 
   dispose() {

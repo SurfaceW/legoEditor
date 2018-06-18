@@ -17,10 +17,24 @@ You can use this editor tool to edit legao project's page.js and project.js.
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
-
 ## Known Issues
 
-Not have now.
+### Bugs
+
+- double trigger save / sync status.
+- optimze the pop-up messages of `vscode.window`.
+
+Reserved Problems:
+
+- Support global.js editing.
+- Support multi-page and multi-tab connections with accurate matching.
+
+
+### Enhancements
+
+- support send `save` action to the ws-client.
+- support edit `page.js` and `global.js` or a universal editing services.
+- support typescript declartion file injection for syntax hint.
 
 ## Release Notes
 
