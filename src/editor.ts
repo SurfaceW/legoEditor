@@ -4,6 +4,10 @@ import * as vscode from 'vscode';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
+import { DocFileUri } from './wsServer';
+
+const PATH_IDENTIFIER = 'legoEditor-';
+const DEFAULT_FILE_NAME = 'default.js';
 
 export default class LeGaoEditor {
 
@@ -16,11 +20,11 @@ export default class LeGaoEditor {
     this.documentPath = '/tmp/';
   }
 
-  async init(content: string) {
+  async init(content: string, uri: DocFileUri) {
     this.pageDocument = content;
     try {
-      const tempDir = await fse.mkdtemp(path.join(os.tmpdir(), 'legoEditor-'));
-      this.documentPath = `${tempDir}/page.js`;
+      const tempDir = await fse.mkdtemp(path.join(os.tmpdir(), PATH_IDENTIFIER));
+      this.documentPath = `${tempDir}/${uri.title || DEFAULT_FILE_NAME}`;
       console.log('target path is:', this.documentPath);
       await fse.writeFile(this.documentPath, this.pageDocument);
       this.editorDocument = await vscode.workspace.openTextDocument(this.documentPath);
@@ -32,8 +36,10 @@ export default class LeGaoEditor {
     }
   }
 
-  async updateDocument(content: string) {
+  async updateDocument(content: string, uri: DocFileUri) {
     this.pageDocument = content;
+    this.editorDocument = vscode.workspace.textDocuments
+      .find(d => d.uri.fsPath.split('/').pop() === uri.title);
     if (!this.editorDocument) {
       return Promise.reject('fail, can not find editorDocument');
     }
@@ -41,7 +47,7 @@ export default class LeGaoEditor {
       const changeInstance = new vscode.WorkspaceEdit();
       const lastLine = this.editorDocument.lineAt(this.editorDocument.lineCount - 1);
       changeInstance.replace(
-        vscode.Uri.file(this.documentPath),
+        this.editorDocument.uri,
         new vscode.Range(
           new vscode.Position(0, 0),
           new vscode.Position(this.editorDocument.lineCount - 1,
