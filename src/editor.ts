@@ -12,6 +12,13 @@ export const DEFAULT_FILE_NAME = 'default.js';
 export default class LeGaoEditor {
   async init(content: string, uri: DocFileUri) {
     const pageDocument = content;
+    const prevEditorDocument = vscode.workspace.textDocuments
+      .find(d => d.uri.fsPath.split('/').pop() === uri.title);
+    
+    if (prevEditorDocument) {
+      return;
+    }
+
     try {
       const tempDir = await fse.mkdtemp(path.join(os.tmpdir(), PATH_IDENTIFIER));
       const documentPath = `${tempDir}/${uri.title || DEFAULT_FILE_NAME}`;
@@ -32,6 +39,9 @@ export default class LeGaoEditor {
       .find(d => d.uri.fsPath.split('/').pop() === uri.title);
     if (!editorDocument) {
       return Promise.reject('fail, can not find editorDocument');
+    }
+    if (editorDocument.isClosed) {
+      return;
     }
     try {
       const changeInstance = new vscode.WorkspaceEdit();

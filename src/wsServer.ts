@@ -50,9 +50,8 @@ export interface IMessage {
 let serverSingleton: WebSocketServer;
 
 export default class WebSocketServer {
-
   server: WebSocket.Server;
-  socket: any;
+  socket: WebSocket;
   editor: LeGaoEditor;
   
   constructor() {
@@ -61,10 +60,9 @@ export default class WebSocketServer {
     }
 
     this.server = new WebSocket.Server({ port: WS_PORT });
-    this.server.on('connection', (socket) => {
+    this.server.on('connection', (socket: WebSocket) => {
       this.socket = socket;
-      this.socket.on('message', (event: any) => {
-        // console.log('receive message', event);
+      socket.on('message', (event: any) => {
         this.handleMessage(event);
       });
     });
@@ -75,7 +73,6 @@ export default class WebSocketServer {
 
     this.editor = new LeGaoEditor();
     this.registerEvents();
-
     serverSingleton = this;
   }
 
@@ -85,21 +82,19 @@ export default class WebSocketServer {
     }
   }
 
-  postMessage(message: IMessage) {
-    this.socket.send(message);
-  }
-
   registerEvents() {
     vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
-      if (document && document.uri.fsPath.indexOf(PATH_IDENTIFIER)) {
-        this.socket.send(JSON.stringify({
-          type: ACTION_TYPES.UPDATE_PAGE_JS,
-          data: document.getText(),
-          uri: {
-            uuid: '',
-            title: document.uri.fsPath.split('/').pop(),
-          },
-        }));
+      if (document && document.uri.fsPath.indexOf(PATH_IDENTIFIER) !== -1) {
+        this.server.clients.forEach((c: WebSocket) => {
+          c.send(JSON.stringify({
+            type: ACTION_TYPES.UPDATE_PAGE_JS,
+            data: document.getText(),
+            uri: {
+              uuid: '',
+              title: document.uri.fsPath.split('/').pop(),
+            },
+          }));
+        });
       }
     });
   }
@@ -121,7 +116,6 @@ export default class WebSocketServer {
     } else if (message.type === ACTION_TYPES.UPDATE_PAGE_JS) {
       messageInfo = await this.editor.updateDocument(message.data, message.uri);
     }
-    // vscode.window.showInformationMessage(messageInfo);
     console.log(messageInfo);
   }
 }
