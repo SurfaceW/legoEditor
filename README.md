@@ -21,6 +21,7 @@ Include if your extension adds any VS Code settings through the `contributes.con
 
 ### Bugs
 
+- [ ] close editors should be disposed while reopen the page won't make text show again.
 - [x] double trigger save / sync status.
 - [x] optimze the pop-up messages of `vscode.window`.
 

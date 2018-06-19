@@ -16,6 +16,7 @@ export default class LeGaoEditor {
       .find(d => d.uri.fsPath.split('/').pop() === uri.title);
     
     if (prevEditorDocument) {
+      await vscode.window.showTextDocument(prevEditorDocument, 1, false);
       return;
     }
 

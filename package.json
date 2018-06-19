@@ -2,7 +2,7 @@
   "name": "legoeditor",
   "displayName": "LegoEditor",
   "description": "lego local scripts editor for go.alibaba-inc.com",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "surfacew",
   "engines": {
     "vscode": "^1.24.0"
