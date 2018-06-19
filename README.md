@@ -21,19 +21,19 @@ Include if your extension adds any VS Code settings through the `contributes.con
 
 ### Bugs
 
-- double trigger save / sync status.
-- optimze the pop-up messages of `vscode.window`.
+- [x] double trigger save / sync status.
+- [x] optimze the pop-up messages of `vscode.window`.
 
 Reserved Problems:
 
-- Support global.js editing.
-- Support multi-page and multi-tab connections with accurate matching.
+- [x] Support global.js editing.
+- [x] Support multi-page and multi-tab connections with accurate matching.
 
 
 ### Enhancements
 
 - support send `save` action to the ws-client.
-- support edit `page.js` and `global.js` or a universal editing services.
+- [x] support edit `page.js` and `global.js` or a universal editing services.
 - support typescript declartion file injection for syntax hint.
 
 ## Release Notes
