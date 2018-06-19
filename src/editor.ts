@@ -6,29 +6,19 @@ import * as path from 'path';
 import * as os from 'os';
 import { DocFileUri } from './wsServer';
 
-const PATH_IDENTIFIER = 'legoEditor-';
-const DEFAULT_FILE_NAME = 'default.js';
+export const PATH_IDENTIFIER = 'legoEditor-';
+export const DEFAULT_FILE_NAME = 'default.js';
 
 export default class LeGaoEditor {
-
-  pageDocument: string;
-  editorDocument?: vscode.TextDocument;
-  documentPath: string;
-
-  constructor() {
-    this.pageDocument = '';
-    this.documentPath = '/tmp/';
-  }
-
   async init(content: string, uri: DocFileUri) {
-    this.pageDocument = content;
+    const pageDocument = content;
     try {
       const tempDir = await fse.mkdtemp(path.join(os.tmpdir(), PATH_IDENTIFIER));
-      this.documentPath = `${tempDir}/${uri.title || DEFAULT_FILE_NAME}`;
-      console.log('target path is:', this.documentPath);
-      await fse.writeFile(this.documentPath, this.pageDocument);
-      this.editorDocument = await vscode.workspace.openTextDocument(this.documentPath);
-      await vscode.window.showTextDocument(this.editorDocument, 1, false);
+      const documentPath = `${tempDir}/${uri.title || DEFAULT_FILE_NAME}`;
+      console.log('target path is:', documentPath);
+      await fse.writeFile(documentPath, pageDocument);
+      const editorDocument = await vscode.workspace.openTextDocument(documentPath);
+      await vscode.window.showTextDocument(editorDocument, 1, false);
       return Promise.resolve('success open file in tmp dir');
     } catch (e) {
       console.error(e);
@@ -37,22 +27,22 @@ export default class LeGaoEditor {
   }
 
   async updateDocument(content: string, uri: DocFileUri) {
-    this.pageDocument = content;
-    this.editorDocument = vscode.workspace.textDocuments
+    const pageDocument = content;
+    const editorDocument = vscode.workspace.textDocuments
       .find(d => d.uri.fsPath.split('/').pop() === uri.title);
-    if (!this.editorDocument) {
+    if (!editorDocument) {
       return Promise.reject('fail, can not find editorDocument');
     }
     try {
       const changeInstance = new vscode.WorkspaceEdit();
-      const lastLine = this.editorDocument.lineAt(this.editorDocument.lineCount - 1);
+      const lastLine = editorDocument.lineAt(editorDocument.lineCount - 1);
       changeInstance.replace(
-        this.editorDocument.uri,
+        editorDocument.uri,
         new vscode.Range(
           new vscode.Position(0, 0),
-          new vscode.Position(this.editorDocument.lineCount - 1,
+          new vscode.Position(editorDocument.lineCount - 1,
             lastLine.text.length <= 0 ? 0 : lastLine.text.length)),
-        this.pageDocument,
+        pageDocument,
       );
       const isSuccess = await vscode.workspace.applyEdit(changeInstance);
       if (isSuccess) {

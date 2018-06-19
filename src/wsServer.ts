@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as WebSocket from 'ws';
 
-import LeGaoEditor from './editor';
+import LeGaoEditor, { PATH_IDENTIFIER } from './editor';
 
 // TODO: make it inside extension configurations
 const WS_PORT: number = 8887;
@@ -91,10 +91,14 @@ export default class WebSocketServer {
 
   registerEvents() {
     vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
-      if (document && document.uri.fsPath.indexOf('')) {
+      if (document && document.uri.fsPath.indexOf(PATH_IDENTIFIER)) {
         this.socket.send(JSON.stringify({
           type: ACTION_TYPES.UPDATE_PAGE_JS,
           data: document.getText(),
+          uri: {
+            uuid: '',
+            title: document.uri.fsPath.split('/').pop(),
+          },
         }));
       }
     });
@@ -107,6 +111,7 @@ export default class WebSocketServer {
     };
     try {
       message = JSON.parse(event);
+      console.log(message);
     } catch (e) {
       console.error(e);
     }
