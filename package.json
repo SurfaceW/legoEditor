@@ -10,15 +10,22 @@
   "categories": [
     "Other"
   ],
+  "icon": "./icon.jpg",
   "activationEvents": [
-    "onCommand:extension.legoConnectPageJS"
+    "onCommand:extension.connectLeGao",
+    "onCommand:extension.disconnectLeGao",
+    "*:extension.connectLeGao"
   ],
   "main": "./out/extension",
   "contributes": {
     "commands": [
       {
-        "command": "extension.legoConnectPageJS",
-        "title": "LeGao: connect page.js"
+        "command": "extension.connectLeGao",
+        "title": "connect LeGao js files"
+      },
+      {
+        "command": "extension.disconnectLeGao",
+        "title": "disconnect LeGao js files"
       }
     ]
   },

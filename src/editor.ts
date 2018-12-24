@@ -16,7 +16,11 @@ export default class LeGaoEditor {
       .find(d => d.uri.fsPath.split('/').pop() === uri.title);
     
     if (prevEditorDocument) {
-      await vscode.window.showTextDocument(prevEditorDocument, 1, false);
+      await vscode.window.showTextDocument(prevEditorDocument, {
+        viewColumn: 1,
+        preserveFocus: false,
+        preview: false,
+      });
       return;
     }
 
@@ -26,7 +30,11 @@ export default class LeGaoEditor {
       console.log('target path is:', documentPath);
       await fse.writeFile(documentPath, pageDocument);
       const editorDocument = await vscode.workspace.openTextDocument(documentPath);
-      await vscode.window.showTextDocument(editorDocument, 1, false);
+      await vscode.window.showTextDocument(editorDocument, {
+        viewColumn: 1,
+        preserveFocus: false,
+        preview: false,
+      });
       return Promise.resolve('success open file in tmp dir');
     } catch (e) {
       console.error(e);
